@@ -150,7 +150,7 @@ input, select {
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+function initVolunteerGrid() {
 
   const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/k1hui7hlzjbc7guwkssndbhx43u97it1";
 
@@ -339,7 +339,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setStatus("");
   });
 
-});
+}
+
+// Run init reliably, even if DOMContentLoaded already fired
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initVolunteerGrid);
+} else {
+  initVolunteerGrid();
+}
 </script>
 </body>
 </html>
