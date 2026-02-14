@@ -150,7 +150,7 @@ input, select {
 </div>
 
 <script>
-const MAKE_WEBHOOK_URL = "https://put hook here";
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/k1hui7hlzjbc7guwkssndbhx43u97it1";
 
 const stakeWards = {
   Hooper: ["W1","W2","W3","W4"],
@@ -290,11 +290,13 @@ document.getElementById("volForm").addEventListener("submit", async (e) => {
 
   setStatus("Submitting…");
   try {
-    const res = await fetch(MAKE_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ submittedAt: new Date().toISOString(), rows })
-    });
+  const res = await fetch(MAKE_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ submittedAt: new Date().toISOString(), rows }),
+    mode: "cors",
+    cache: "no-cache"
+  });
 
     const text = await res.text();
     if (res.ok) setStatus(`Submitted ${rows.length} row(s).`, "ok");
