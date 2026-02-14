@@ -150,201 +150,195 @@ input, select {
 </div>
 
 <script>
-const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/k1hui7hlzjbc7guwkssndbhx43u97it1";
+document.addEventListener("DOMContentLoaded", () => {
 
-const stakeWards = {
-  Hooper: ["W1","W2","W3","W4"],
-  Flooper: ["North","South","East","West"],
-  Dooper: ["5","6","7","8"]
-};
+  const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/k1hui7hlzjbc7guwkssndbhx43u97it1";
 
-const timeMap = {
-  "AM Volunteer": "8:30-10:30 AM",
-  "PM Volunteer": "5:00-7:00 PM"
-};
+  const stakeWards = {
+    Hooper: ["W1","W2","W3","W4"],
+    Flooper: ["North","South","East","West"],
+    Dooper: ["5","6","7","8"]
+  };
 
-const grid = document.getElementById("grid");
+  const timeMap = {
+    "AM Volunteer": "8:30-10:30 AM",
+    "PM Volunteer": "5:00-7:00 PM"
+  };
 
-// Top-of-form Stake/Ward (applies to all rows)
-const stakeTop = document.getElementById("stakeTop");
-const wardTop  = document.getElementById("wardTop");
+  const grid = document.getElementById("grid");
+  const stakeTop = document.getElementById("stakeTop");
+  const wardTop  = document.getElementById("wardTop");
+  const form     = document.getElementById("volForm");
 
-function populateStakeTop() {
-  stakeTop.innerHTML = `<option value="">Select stake</option>` +
-    Object.keys(stakeWards).map(s => `<option value="${s}">${s}</option>`).join("");
-}
-function updateWardsTop() {
-  const stake = stakeTop.value;
-  wardTop.innerHTML = `<option value="">Select ward</option>`;
-  (stakeWards[stake] || []).forEach(w => {
-    const opt = document.createElement("option");
-    opt.value = w;
-    opt.textContent = w;
-    wardTop.appendChild(opt);
-  });
-}
-stakeTop.addEventListener("change", updateWardsTop);
-populateStakeTop();
-
-
-// These attributes are widely respected by password managers + help browsers back off.
-const IGNORE_ATTRS = `
-  autocomplete="new-password"
-  data-lpignore="true"
-  data-1p-ignore="true"
-  data-bwignore="true"
-`;
-
-function createRow(i) {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td class="rownum">${i+1}</td>
-
-    <!-- NOTE: names avoid "name/email/phone" keywords to reduce heuristics -->
-    <td><input id="fn_${i}" name="fn_${i}" type="text" ${IGNORE_ATTRS} autocapitalize="words" spellcheck="false" /></td>
-    <td><input id="ph_${i}" name="ph_${i}" type="tel"  ${IGNORE_ATTRS} inputmode="tel" /></td>
-    <td><input id="em_${i}" name="em_${i}" type="email" ${IGNORE_ATTRS} autocapitalize="none" spellcheck="false" inputmode="email" /></td>
-
-    <td class="optcell"><input id="oi_${i}" name="oi_${i}" type="checkbox" aria-label="SMS Opt-In" /></td>
-
-    <td class="details">
-      <div class="detailsGrid">
-<label class="miniLabel">Date
-          <input id="dt_${i}" name="dt_${i}" type="date" ${IGNORE_ATTRS} />
-        </label>
-
-        <label class="miniLabel">Time Slot
-          <select id="ts_${i}" name="ts_${i}">
-            <option value="">Select</option>
-            <option value="AM Volunteer">AM Volunteer</option>
-            <option value="PM Volunteer">PM Volunteer</option>
-          </select>
-        </label>
-
-        <label class="miniLabel">Time Range
-          <select id="tr_${i}" name="tr_${i}">
-            <option value="">Select</option>
-            <option value="8:30-10:30 AM">8:30-10:30 AM</option>
-            <option value="5:00-7:00 PM">5:00-7:00 PM</option>
-          </select>
-        </label>
-      </div>
-    </td>
-  `;
-  tr.querySelector(`#ts_${i}`).addEventListener("change", () => updateTimeRange(i));
-
-  return tr;
-}
-
-function updateTimeRange(i) {
-  const ts = document.getElementById(`ts_${i}`).value;
-  document.getElementById(`tr_${i}`).value = timeMap[ts] || "";
-}
-
-// Render 8 rows
-for (let i=0; i<8; i++) grid.appendChild(createRow(i));
-
-const v = (id) => (document.getElementById(id).value || "").trim();
-const c = (id) => !!document.getElementById(id).checked;
-const digitsOnly = (s) => (s || "").replace(/\D/g, "");
-
-const norm = (s) =>
-  (s || "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, " "); // collapse multiple spaces
-
-function buildDedupeKey({ stake, ward, fullName, phone, date, timeslot }) {
-  return [
-    norm(stake),
-    norm(ward),
-    norm(fullName),
-    digitsOnly(phone),
-    (date || "").trim(),
-    norm(timeslot),
-  ].join("|");
-}
-
-function collectRows() {
-const stake = v("stakeTop");
-const ward  = v("wardTop");
-
-const rBase = {
-  row: i+1,
-  fullName: v(`fn_${i}`),
-  phone: v(`ph_${i}`),
-  email: v(`em_${i}`),
-  stake,
-  ward,
-  date: v(`dt_${i}`),
-  timeslot: v(`ts_${i}`),
-  timerange: v(`tr_${i}`)
-};
-
-const r = {
-  ...rBase,
-  dedupeKey: buildDedupeKey(rBase),
-  optIn: c(`oi_${i}`) // keep last
-};
-
-
-    
-    const hasAny = Object.entries(r).some(([k,val]) => !["row","optIn","stake","ward"].includes(k) && val);
-    if (hasAny) rows.push(r);
-  }
-  return rows;
-}
-
-function setStatus(msg, cls="") {
-  const s = document.getElementById("status");
-  s.textContent = msg;
-  s.className = `status ${cls}`;
-}
-
-document.getElementById("volForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  if (!MAKE_WEBHOOK_URL || MAKE_WEBHOOK_URL.includes("MAKE_WEBHOOK_URL_HERE")) {
-    setStatus("Set MAKE_WEBHOOK_URL in the code first.", "err");
+  // If any are missing, stop with a helpful error
+  if (!grid || !stakeTop || !wardTop || !form) {
+    console.error("Missing required element(s):", { grid, stakeTop, wardTop, form });
     return;
   }
 
-  if (!v("stakeTop")) { setStatus("Select a Stake at the top of the form.", "err"); return; }
-  if (!v("wardTop"))  { setStatus("Select a Ward at the top of the form.", "err"); return; }
+  function populateStakeTop() {
+    stakeTop.innerHTML = `<option value="">Select stake</option>` +
+      Object.keys(stakeWards).map(s => `<option value="${s}">${s}</option>`).join("");
+  }
 
-  const rows = collectRows();
-  if (!rows.length) { setStatus("No data to submit.", "err"); return; }
+  function updateWardsTop() {
+    const stake = stakeTop.value;
+    wardTop.innerHTML = `<option value="">Select ward</option>`;
+    (stakeWards[stake] || []).forEach(w => {
+      const opt = document.createElement("option");
+      opt.value = w;
+      opt.textContent = w;
+      wardTop.appendChild(opt);
+    });
+  }
 
-  setStatus("Submitting…");
-  try {
-  const res = await fetch(MAKE_WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ submittedAt: new Date().toISOString(), rows }),
-    mode: "cors",
-    cache: "no-cache"
+  stakeTop.addEventListener("change", updateWardsTop);
+  populateStakeTop();
+
+  const IGNORE_ATTRS = `
+    autocomplete="new-password"
+    data-lpignore="true"
+    data-1p-ignore="true"
+    data-bwignore="true"
+  `;
+
+  function createRow(i) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="rownum">${i+1}</td>
+      <td><input id="fn_${i}" name="fn_${i}" type="text" ${IGNORE_ATTRS} autocapitalize="words" spellcheck="false" /></td>
+      <td><input id="ph_${i}" name="ph_${i}" type="tel"  ${IGNORE_ATTRS} inputmode="tel" /></td>
+      <td><input id="em_${i}" name="em_${i}" type="email" ${IGNORE_ATTRS} autocapitalize="none" spellcheck="false" inputmode="email" /></td>
+      <td class="optcell"><input id="oi_${i}" name="oi_${i}" type="checkbox" aria-label="SMS Opt-In" /></td>
+
+      <td class="details">
+        <div class="detailsGrid">
+          <label class="miniLabel">Date
+            <input id="dt_${i}" name="dt_${i}" type="date" ${IGNORE_ATTRS} />
+          </label>
+
+          <label class="miniLabel">Time Slot
+            <select id="ts_${i}" name="ts_${i}">
+              <option value="">Select</option>
+              <option value="AM Volunteer">AM Volunteer</option>
+              <option value="PM Volunteer">PM Volunteer</option>
+            </select>
+          </label>
+
+          <label class="miniLabel">Time Range
+            <select id="tr_${i}" name="tr_${i}">
+              <option value="">Select</option>
+              <option value="8:30-10:30 AM">8:30-10:30 AM</option>
+              <option value="5:00-7:00 PM">5:00-7:00 PM</option>
+            </select>
+          </label>
+        </div>
+      </td>
+    `;
+    tr.querySelector(`#ts_${i}`).addEventListener("change", () => {
+      const ts = document.getElementById(`ts_${i}`).value;
+      document.getElementById(`tr_${i}`).value = timeMap[ts] || "";
+    });
+    return tr;
+  }
+
+  // Render 8 rows
+  grid.innerHTML = "";
+  for (let i=0; i<8; i++) grid.appendChild(createRow(i));
+
+  const v = (id) => (document.getElementById(id).value || "").trim();
+  const c = (id) => !!document.getElementById(id).checked;
+
+  const digitsOnly = (s) => (s || "").replace(/\D/g, "");
+  const norm = (s) => (s || "").toLowerCase().trim().replace(/\s+/g, " ");
+
+  function buildDedupeKey({ stake, ward, fullName, phone, date, timeslot }) {
+    return [
+      norm(stake),
+      norm(ward),
+      norm(fullName),
+      digitsOnly(phone),
+      (date || "").trim(),
+      norm(timeslot),
+    ].join("|");
+  }
+
+  function collectRows() {
+    const rows = [];
+    for (let i=0; i<8; i++) {
+      const stake = v("stakeTop");
+      const ward  = v("wardTop");
+
+      const rBase = {
+        row: i+1,
+        fullName: v(`fn_${i}`),
+        phone: v(`ph_${i}`),
+        email: v(`em_${i}`),
+        stake,
+        ward,
+        date: v(`dt_${i}`),
+        timeslot: v(`ts_${i}`),
+        timerange: v(`tr_${i}`)
+      };
+
+      const r = {
+        ...rBase,
+        dedupeKey: buildDedupeKey(rBase),
+        optIn: c(`oi_${i}`) // keep last
+      };
+
+      const hasAny = Object.entries(r).some(([k,val]) =>
+        !["row","optIn","stake","ward","dedupeKey"].includes(k) && val
+      );
+      if (hasAny) rows.push(r);
+    }
+    return rows;
+  }
+
+  function setStatus(msg, cls="") {
+    const s = document.getElementById("status");
+    s.textContent = msg;
+    s.className = `status ${cls}`;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!v("stakeTop")) { setStatus("Select a Stake at the top of the form.", "err"); return; }
+    if (!v("wardTop"))  { setStatus("Select a Ward at the top of the form.", "err"); return; }
+
+    const rows = collectRows();
+    if (!rows.length) { setStatus("No data to submit.", "err"); return; }
+
+    setStatus("Submitting…");
+    try {
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submittedAt: new Date().toISOString(), rows })
+      });
+
+      const text = await res.text();
+      if (res.ok) {
+        setStatus(`Submitted ${rows.length} row(s).`, "ok");
+        document.getElementById("clearBtn").click(); // auto-clear after success
+      } else {
+        setStatus(`Submit failed (${res.status}): ${text}`, "err");
+      }
+    } catch (err) {
+      setStatus(`Submit failed: ${err.message || err}`, "err");
+    }
   });
 
-    const text = await res.text();
-    if (res.ok) {
-  setStatus(`Submitted ${rows.length} row(s).`, "ok");
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    for (let i=0; i<8; i++) {
+      ["fn","ph","em","dt"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
+      document.getElementById(`oi_${i}`).checked = false;
+      ["ts","tr"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
+    }
+    setStatus("");
+  });
 
-  // Auto-clear the form after successful submission
-  document.getElementById("clearBtn").click();
-}
-    else setStatus(`Submit failed (${res.status}): ${text}`, "err");
-  } catch (err) {
-    setStatus(`Submit failed: ${err.message || err}`, "err");
-  }
-});
-
-document.getElementById("clearBtn").addEventListener("click", () => {
-  for (let i=0; i<8; i++) {
-    ["fn","ph","em","dt"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
-    document.getElementById(`oi_${i}`).checked = false;
-    ["ts","tr"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
-      }
-  setStatus("");
 });
 </script>
 </body>
