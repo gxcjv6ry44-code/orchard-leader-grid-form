@@ -128,7 +128,7 @@ input, select {
       </div>
 
       <div class="actions">
-        <button class="primary" type="submit">Submit to Make</button>
+        <button class="primary" type="submit" id="submitBtn">Submit to Make</button>
         <button class="secondary" type="button" id="clearBtn">Clear</button>
         <span id="status" class="status"></span>
       </div>
@@ -299,7 +299,12 @@ document.getElementById("volForm").addEventListener("submit", async (e) => {
   });
 
     const text = await res.text();
-    if (res.ok) setStatus(`Submitted ${rows.length} row(s).`, "ok");
+    if (res.ok) {
+  setStatus(`Submitted ${rows.length} row(s).`, "ok");
+
+  // Auto-clear the form after successful submission
+  document.getElementById("clearBtn").click();
+}
     else setStatus(`Submit failed (${res.status}): ${text}`, "err");
   } catch (err) {
     setStatus(`Submit failed: ${err.message || err}`, "err");
