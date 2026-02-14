@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volunteer Entry Grid</title>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#f6f7f9; margin:0; }
+    .wrap { max-width:1200px; margin:20px auto; padding:16px; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; }
+    header { padding:14px 16px; border-bottom:1px solid #e5e7eb; }
+    header h1 { margin:0 0 6px; font-size:18px; }
+    header p { margin:0; font-size:13px; color:#4b5563; }
+
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #e5e7eb; padding:8px; }
+    th { background:#f3f4f6; font-size:12px; text-align:left; position: sticky; top: 0; }
+    .rownum { width:48px; text-align:center; color:#6b7280; background:#fafafa; }
+
+    
+
+    .tableWrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    td.details { min-width:520px; }
+    .detailsGrid { display:grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap:8px; }
+    .miniLabel { display:flex; flex-direction:column; gap:4px; font-size:11px; color:#6b7280; }
+    .miniLabel input, .miniLabel select { font-size:14px; color:#111827; }
+
+    .optcell { text-align:center; }
+    .optcell input[type="checkbox"] { width:18px; height:18px; }
+
+    @media (max-width: 900px) {
+      td.details { min-width:320px; }
+      .detailsGrid { grid-template-columns: 1fr; }
+    }
+input, select {
+      width:100%;
+      padding:8px;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      font-size:14px;
+      box-sizing: border-box;
+    }
+
+    .actions { margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    button { padding:10px 14px; border-radius:10px; border:0; font-weight:600; cursor:pointer; }
+    .primary { background:#2563eb; color:#fff; }
+    .secondary { background:#e5e7eb; }
+
+    .status { font-size:13px; }
+    .ok { color:#065f46; }
+    .err { color:#991b1b; }
+
+    /* Decoy fields: off-screen but present */
+    .decoy {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      height: 1px;
+      width: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+  
+    .optcell { text-align:center; }
+    .optcell input[type="checkbox"] { width:auto; transform: scale(1.1); }
+
+  
+    .topSelectors { margin: 0 0 14px 0; padding: 12px; border:1px solid #e5e7eb; border-radius:12px; background:#fbfbfc; }
+    .topGrid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .topSelectors label { display:block; font-size:14px; color:#111827; }
+    .topSelectors select { width:100%; margin-top:6px; padding:10px 10px; border:1px solid #d1d5db; border-radius:10px; background:#fff; font-size:14px; }
+    .hint { margin-top:8px; font-size:12px; color:#6b7280; }
+    @media (max-width: 760px) { .topGrid { grid-template-columns: 1fr; } }
+
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <h1>Volunteer Entry Form</h1>
+      <p>Fill any rows you need. Empty rows are ignored.</p>
+    </header>
+
+    <form id="volForm" autocomplete="off" style="padding:16px; position:relative;">
+
+      <!-- Autofill decoys (most browsers/password managers will fill THESE instead of your grid) -->
+      <input class="decoy" type="text"  name="contact_name"  autocomplete="name">
+      <input class="decoy" type="email" name="contact_email" autocomplete="email">
+      <input class="decoy" type="tel"   name="contact_phone" autocomplete="tel">
+      <input class="decoy" type="password" name="password" autocomplete="current-password">
+
+      
+      <div class="topSelectors">
+        <div class="topGrid">
+          <label>Stake
+            <select id="stakeTop" name="stakeTop" required>
+              <option value="">Select stake</option>
+            </select>
+          </label>
+
+          <label>Ward
+            <select id="wardTop" name="wardTop" required>
+              <option value="">Select ward</option>
+            </select>
+          </label>
+        </div>
+        <div class="hint">Select the Stake and Ward once. All rows submitted below will use the same Stake and Ward.</div>
+      </div>
+
+
+      <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="rownum">#</th>
+            <th>Full Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>SMS Opt-In</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="grid"></tbody>
+      </table>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit">Submit to Make</button>
+        <button class="secondary" type="button" id="clearBtn">Clear</button>
+        <span id="status" class="status"></span>
+      </div>
+
+
+      <div style="margin-top:16px; padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#fafafa;">
+        <div style="font-weight:700; margin-bottom:6px;">SMS Opt-In Consent</div>
+        <div style="font-size:12px; color:#374151; line-height:1.35;">
+          By checking the “SMS Opt-In” box for a row, I agree to receive messages sent via an autodialer from North Ogden Orchard, and this agreement isn’t a condition of any purchase.
+          I also agree to the Terms of Service and Privacy Policy of about 4 Msgs/Month. Msg &amp; Data rates may apply.
+          Text STOP to opt-out. Text HELP for assistance.
+          By submitting this form, I agree that my mobile information will not be shared with third parties/affiliates for marketing/promotional purposes.
+          All the above categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties, except for the necessary opt-in data required to facilitate the SMS service.
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+const MAKE_WEBHOOK_URL = "https://put hook here";
+
+const stakeWards = {
+  Hooper: ["W1","W2","W3","W4"],
+  Flooper: ["North","South","East","West"],
+  Dooper: ["5","6","7","8"]
+};
+
+const timeMap = {
+  "AM Volunteer": "8:30-10:30 AM",
+  "PM Volunteer": "5:00-7:00 PM"
+};
+
+const grid = document.getElementById("grid");
+
+// Top-of-form Stake/Ward (applies to all rows)
+const stakeTop = document.getElementById("stakeTop");
+const wardTop  = document.getElementById("wardTop");
+
+function populateStakeTop() {
+  stakeTop.innerHTML = `<option value="">Select stake</option>` +
+    Object.keys(stakeWards).map(s => `<option value="${s}">${s}</option>`).join("");
+}
+function updateWardsTop() {
+  const stake = stakeTop.value;
+  wardTop.innerHTML = `<option value="">Select ward</option>`;
+  (stakeWards[stake] || []).forEach(w => {
+    const opt = document.createElement("option");
+    opt.value = w;
+    opt.textContent = w;
+    wardTop.appendChild(opt);
+  });
+}
+stakeTop.addEventListener("change", updateWardsTop);
+populateStakeTop();
+
+
+// These attributes are widely respected by password managers + help browsers back off.
+const IGNORE_ATTRS = `
+  autocomplete="new-password"
+  data-lpignore="true"
+  data-1p-ignore="true"
+  data-bwignore="true"
+`;
+
+function createRow(i) {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td class="rownum">${i+1}</td>
+
+    <!-- NOTE: names avoid "name/email/phone" keywords to reduce heuristics -->
+    <td><input id="fn_${i}" name="fn_${i}" type="text" ${IGNORE_ATTRS} autocapitalize="words" spellcheck="false" /></td>
+    <td><input id="ph_${i}" name="ph_${i}" type="tel"  ${IGNORE_ATTRS} inputmode="tel" /></td>
+    <td><input id="em_${i}" name="em_${i}" type="email" ${IGNORE_ATTRS} autocapitalize="none" spellcheck="false" inputmode="email" /></td>
+
+    <td class="optcell"><input id="oi_${i}" name="oi_${i}" type="checkbox" aria-label="SMS Opt-In" /></td>
+
+    <td class="details">
+      <div class="detailsGrid">
+<label class="miniLabel">Date
+          <input id="dt_${i}" name="dt_${i}" type="date" ${IGNORE_ATTRS} />
+        </label>
+
+        <label class="miniLabel">Time Slot
+          <select id="ts_${i}" name="ts_${i}">
+            <option value="">Select</option>
+            <option value="AM Volunteer">AM Volunteer</option>
+            <option value="PM Volunteer">PM Volunteer</option>
+          </select>
+        </label>
+
+        <label class="miniLabel">Time Range
+          <select id="tr_${i}" name="tr_${i}">
+            <option value="">Select</option>
+            <option value="8:30-10:30 AM">8:30-10:30 AM</option>
+            <option value="5:00-7:00 PM">5:00-7:00 PM</option>
+          </select>
+        </label>
+      </div>
+    </td>
+  `;
+  tr.querySelector(`#ts_${i}`).addEventListener("change", () => updateTimeRange(i));
+
+  return tr;
+}
+
+function updateTimeRange(i) {
+  const ts = document.getElementById(`ts_${i}`).value;
+  document.getElementById(`tr_${i}`).value = timeMap[ts] || "";
+}
+
+// Render 8 rows
+for (let i=0; i<8; i++) grid.appendChild(createRow(i));
+
+const v = (id) => (document.getElementById(id).value || "").trim();
+const c = (id) => !!document.getElementById(id).checked;
+
+function collectRows() {
+  const rows = [];
+  for (let i=0; i<8; i++) {
+    const r = {
+      row: i+1,
+      fullName: v(`fn_${i}`),
+      phone: v(`ph_${i}`),
+      email: v(`em_${i}`),
+      stake: v("stakeTop"),
+      ward: v("wardTop"),
+      date: v(`dt_${i}`),
+      timeslot: v(`ts_${i}`),
+      timerange: v(`tr_${i}`),
+      optIn: c(`oi_${i}`)
+    };
+    const hasAny = Object.entries(r).some(([k,val]) => !["row","optIn","stake","ward"].includes(k) && val);
+    if (hasAny) rows.push(r);
+  }
+  return rows;
+}
+
+function setStatus(msg, cls="") {
+  const s = document.getElementById("status");
+  s.textContent = msg;
+  s.className = `status ${cls}`;
+}
+
+document.getElementById("volForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!MAKE_WEBHOOK_URL || MAKE_WEBHOOK_URL.includes("MAKE_WEBHOOK_URL_HERE")) {
+    setStatus("Set MAKE_WEBHOOK_URL in the code first.", "err");
+    return;
+  }
+
+  if (!v("stakeTop")) { setStatus("Select a Stake at the top of the form.", "err"); return; }
+  if (!v("wardTop"))  { setStatus("Select a Ward at the top of the form.", "err"); return; }
+
+  const rows = collectRows();
+  if (!rows.length) { setStatus("No data to submit.", "err"); return; }
+
+  setStatus("Submitting…");
+  try {
+    const res = await fetch(MAKE_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ submittedAt: new Date().toISOString(), rows })
+    });
+
+    const text = await res.text();
+    if (res.ok) setStatus(`Submitted ${rows.length} row(s).`, "ok");
+    else setStatus(`Submit failed (${res.status}): ${text}`, "err");
+  } catch (err) {
+    setStatus(`Submit failed: ${err.message || err}`, "err");
+  }
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  for (let i=0; i<8; i++) {
+    ["fn","ph","em","dt"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
+    document.getElementById(`oi_${i}`).checked = false;
+    ["ts","tr"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
+      }
+  setStatus("");
+});
+</script>
+</body>
+</html>
