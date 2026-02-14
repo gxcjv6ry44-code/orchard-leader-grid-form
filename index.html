@@ -246,22 +246,49 @@ for (let i=0; i<8; i++) grid.appendChild(createRow(i));
 
 const v = (id) => (document.getElementById(id).value || "").trim();
 const c = (id) => !!document.getElementById(id).checked;
+const digitsOnly = (s) => (s || "").replace(/\D/g, "");
+
+const norm = (s) =>
+  (s || "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " "); // collapse multiple spaces
+
+function buildDedupeKey({ stake, ward, fullName, phone, date, timeslot }) {
+  return [
+    norm(stake),
+    norm(ward),
+    norm(fullName),
+    digitsOnly(phone),
+    (date || "").trim(),
+    norm(timeslot),
+  ].join("|");
+}
 
 function collectRows() {
-  const rows = [];
-  for (let i=0; i<8; i++) {
-    const r = {
-      row: i+1,
-      fullName: v(`fn_${i}`),
-      phone: v(`ph_${i}`),
-      email: v(`em_${i}`),
-      stake: v("stakeTop"),
-      ward: v("wardTop"),
-      date: v(`dt_${i}`),
-      timeslot: v(`ts_${i}`),
-      timerange: v(`tr_${i}`),
-      optIn: c(`oi_${i}`)
-    };
+const stake = v("stakeTop");
+const ward  = v("wardTop");
+
+const rBase = {
+  row: i+1,
+  fullName: v(`fn_${i}`),
+  phone: v(`ph_${i}`),
+  email: v(`em_${i}`),
+  stake,
+  ward,
+  date: v(`dt_${i}`),
+  timeslot: v(`ts_${i}`),
+  timerange: v(`tr_${i}`)
+};
+
+const r = {
+  ...rBase,
+  dedupeKey: buildDedupeKey(rBase),
+  optIn: c(`oi_${i}`) // keep last
+};
+
+
+    
     const hasAny = Object.entries(r).some(([k,val]) => !["row","optIn","stake","ward"].includes(k) && val);
     if (hasAny) rows.push(r);
   }
