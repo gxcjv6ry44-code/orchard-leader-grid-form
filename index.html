@@ -154,11 +154,147 @@ function initVolunteerGrid() {
 
   const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/k1hui7hlzjbc7guwkssndbhx43u97it1";
 
-  const stakeWards = {
-    Hooper: ["W1","W2","W3","W4"],
-    Flooper: ["North","South","East","West"],
-    Dooper: ["5","6","7","8"]
-  };
+const STAKE_WARDS = {
+
+  BenLomond: [
+    "1st",
+    "4th",
+    "5th",
+    "8th",
+    "9th",
+    "10th",
+    "11th",
+    "12th"
+  ],
+
+  Hooper: [
+    "Hooper 1st",
+    "Hooper 2nd",
+    "Hooper 3rd",
+    "Hooper 4th",
+    "Lakeview",
+    "Park",
+    "Quail Meadows",
+    "Homestead",
+    "Shannondoah"
+  ],
+
+  PerryUtah: [
+    "1st",
+    "2nd",
+    "4th",
+    "5th",
+    "6th",
+    "7th",
+    "8th",
+    "9th",
+    "10th",
+    "Box Elder YSA 1st"
+  ],
+
+  OgdenMoundFort: [
+    "Mill Creek",
+    "Heritage Park",
+    "Pioneer",
+    "Ogden River",
+    "Meadowbrook",
+    "Adobe Mill"
+  ],
+
+  WestHaven: [
+    "Rosewood",
+    "Olive Bluff",
+    "West Haven",
+    "Salt Point",
+    "Stone Creek",
+    "White Rail",
+    "Country Meadows"
+  ],
+
+  PleasantView: [
+    "Pleasant View 1st",
+    "Pleasant View 3rd",
+    "Pleasant View 4th",
+    "Pleasant View 6th",
+    "Pleasant View 11th",
+    "Pleasant View 12th",
+    "Pleasant View 14th",
+    "Pleasant View 18th"
+  ],
+
+  PlainCity: [
+    "Meadows",
+    "1st",
+    "3rd",
+    "4th",
+    "5th",
+    "6th",
+    "9th",
+    "Riverside"
+  ],
+
+  NorthOgdenEast: [
+    "North Ogden 8th",
+    "North Ogden 11th",
+    "North Ogden 13th",
+    "North Ogden 14th",
+    "North Ogden 20th",
+    "North Ogden 22nd",
+    "North Ogden 24th"
+  ],
+
+  Kanesville: [
+    "Prairie Crossing",
+    "Rocky Mountain",
+    "Pheasant Meadow",
+    "Foxglen Park",
+    "Country View",
+    "Fair Grove",
+    "Regal Country"
+  ],
+
+  OgdenWest: [
+    "Kanesville",
+    "Taylor 1st",
+    "Taylor 2nd",
+    "Taylor 3rd",
+    "Taylor 4th",
+    "Taylor 5th",
+    "Taylor 6th"
+  ],
+
+  HooperUtahPioneerTrail: [
+    "Freedom",
+    "Fremont",
+    "Pioneer Trail",
+    "Wildwood",
+    "Eastgate",
+    "Hooper Landings",
+    "Muskrat Springs"
+  ],
+
+  WestHavenNorth: [
+    "Wilson 2nd",
+    "Wilson 3rd",
+    "Wilson 4th",
+    "Wilson 5th",
+    "Riverbend"
+  ],
+
+  Willard: [
+    "Hargis Hill",
+    "Maguire Canyon",
+    "Perry 3rd",
+    "Three Mile Creek",
+    "Willard 1st",
+    "Willard 2nd",
+    "Willard 3rd",
+    "Willard 4th",
+    "Willard 5th",
+    "Willard 6th"
+  ]
+
+};
 
   const timeMap = {
     "AM Volunteer": "8:30-10:30 AM",
