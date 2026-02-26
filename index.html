@@ -156,273 +156,273 @@ function initVolunteerGrid() {
 
 const STAKE_WARDS = {
 
-  BenLomond: ["10th", "11th", "12th", "1st", "4th", "5th", "8th", "9th"],
+BenLomond: ["1st", "4th", "5th", "8th", "9th", "10th", "11th", "12th"],
 
-  BrighamCitySouth: [
-    "Brigham City 10th",
-    "Brigham City 16th",
-    "Brigham City 19th",
-    "Brigham City 21st",
-    "Brigham City 25th",
-    "Brigham City 6th",
-    "Lakeview",
-    "Maple Springs branches",
-    "Mountain View"
-  ],
+BrighamCitySouth: [
+  "Brigham City 6th",
+  "Brigham City 10th",
+  "Brigham City 16th",
+  "Brigham City 19th",
+  "Brigham City 21st",
+  "Brigham City 25th",
+  "Lakeview",
+  "Maple Springs branches",
+  "Mountain View"
+],
 
-  FarrWest: [
-    "Farr West 11th",
-    "Farr West 4th",
-    "Farr West 5th",
-    "Farr West 6th",
-    "Farr West 9th",
-    "Plain City 10th",
-    "Plain City 2nd",
-    "Plain City 7th",
-    "Plain City 8th"
-  ],
+FarrWest: [
+  "Farr West 4th",
+  "Farr West 5th",
+  "Farr West 6th",
+  "Farr West 9th",
+  "Farr West 11th",
+  "Plain City 2nd",
+  "Plain City 7th",
+  "Plain City 8th",
+  "Plain City 10th"
+],
 
-  FarrWestPoplar: [
-    "Cottonwood Creek",
-    "Farr West 1st",
-    "Farr West 2nd",
-    "Farr West 3rd",
-    "Farr West 7th",
-    "Farr West 8th",
-    "Poplar 1st",
-    "Poplar 2nd",
-    "Poplar 3rd",
-    "Poplar 4th"
-  ],
+FarrWestPoplar: [
+  "Cottonwood Creek",
+  "Farr West 1st",
+  "Farr West 2nd",
+  "Farr West 3rd",
+  "Farr West 7th",
+  "Farr West 8th",
+  "Poplar 1st",
+  "Poplar 2nd",
+  "Poplar 3rd",
+  "Poplar 4th"
+],
 
-  Harrisville: [
-    "Harrisville 10th",
-    "Harrisville 1st",
-    "Harrisville 2nd",
-    "Harrisville 3rd",
-    "Harrisville 6th",
-    "Harrisville 7th",
-    "Harrisville 8th",
-    "Harrisville 9th"
-  ],
+Harrisville: [
+  "Harrisville 1st",
+  "Harrisville 2nd",
+  "Harrisville 3rd",
+  "Harrisville 6th",
+  "Harrisville 7th",
+  "Harrisville 8th",
+  "Harrisville 9th",
+  "Harrisville 10th"
+],
 
-  Hooper: [
-    "Homestead",
-    "Hooper 1st",
-    "Hooper 2nd",
-    "Hooper 3rd",
-    "Hooper 4th",
-    "Lakeview",
-    "Park",
-    "Quail Meadows",
-    "Shannondoah"
-  ],
+Hooper: [
+  "Homestead",
+  "Hooper 1st",
+  "Hooper 2nd",
+  "Hooper 3rd",
+  "Hooper 4th",
+  "Lakeview",
+  "Park",
+  "Quail Meadows",
+  "Shannondoah"
+],
 
-  HooperUtahPioneerTrail: [
-    "Eastgate",
-    "Freedom",
-    "Fremont",
-    "Hooper Landings",
-    "Muskrat Springs",
-    "Pioneer Trail",
-    "Wildwood"
-  ],
+HooperUtahPioneerTrail: [
+  "Eastgate",
+  "Freedom",
+  "Fremont",
+  "Hooper Landings",
+  "Muskrat Springs",
+  "Pioneer Trail",
+  "Wildwood"
+],
 
-  HuntsvilleUtah: [
-    "Eden 1st",
-    "Eden 2nd",
-    "Huntsville 1st",
-    "Huntsville 2nd",
-    "Liberty 1st",
-    "Liberty 2nd",
-    "Middle Fork",
-    "Nordic Valley",
-    "North Fork",
-    "South Fork",
-    "Wolf Creek"
-  ],
+HuntsvilleUtah: [
+  "Eden 1st",
+  "Eden 2nd",
+  "Huntsville 1st",
+  "Huntsville 2nd",
+  "Liberty 1st",
+  "Liberty 2nd",
+  "Middle Fork",
+  "Nordic Valley",
+  "North Fork",
+  "South Fork",
+  "Wolf Creek"
+],
 
-  Kanesville: [
-    "Country View",
-    "Fair Grove",
-    "Foxglen Park",
-    "Pheasant Meadow",
-    "Prairie Crossing",
-    "Regal Country",
-    "Rocky Mountain"
-  ],
+Kanesville: [
+  "Country View",
+  "Fair Grove",
+  "Foxglen Park",
+  "Pheasant Meadow",
+  "Prairie Crossing",
+  "Regal Country",
+  "Rocky Mountain"
+],
 
-  NorthOgden: [
-    "North Ogden 16th",
-    "North Ogden 17th",
-    "North Ogden 1st",
-    "North Ogden 21st",
-    "North Ogden 3rd",
-    "North Ogden 5th",
-    "North Ogden 7th",
-    "North Ogden 9th"
-  ],
+NorthOgden: [
+  "North Ogden 1st",
+  "North Ogden 3rd",
+  "North Ogden 5th",
+  "North Ogden 7th",
+  "North Ogden 9th",
+  "North Ogden 16th",
+  "North Ogden 17th",
+  "North Ogden 21st"
+],
 
-  NorthOgdenColdwater: [
-    "10th",
-    "12th",
-    "15th",
-    "19th",
-    "23rd",
-    "2nd",
-    "4th",
-    "6th",
-    "Mountain"
-  ],
+NorthOgdenColdwater: [
+  "2nd",
+  "4th",
+  "6th",
+  "10th",
+  "12th",
+  "15th",
+  "19th",
+  "23rd",
+  "Mountain"
+],
 
-  NorthOgdenEast: [
-    "North Ogden 11th",
-    "North Ogden 13th",
-    "North Ogden 14th",
-    "North Ogden 20th",
-    "North Ogden 22nd",
-    "North Ogden 24th",
-    "North Ogden 8th"
-  ],
+NorthOgdenEast: [
+  "North Ogden 8th",
+  "North Ogden 11th",
+  "North Ogden 13th",
+  "North Ogden 14th",
+  "North Ogden 20th",
+  "North Ogden 22nd",
+  "North Ogden 24th"
+],
 
-  Ogden: [
-    "Bonneville Shoreline",
-    "Hidden Valley",
-    "Jefferson 2nd (Spanish)",
-    "Malan's Peak",
-    "Monroe Branch (retirement)",
-    "Ogden 4th",
-    "Parkway"
-  ],
+Ogden: [
+  "Bonneville Shoreline",
+  "Hidden Valley",
+  "Jefferson 2nd (Spanish)",
+  "Malan's Peak",
+  "Monroe Branch (retirement)",
+  "Ogden 4th",
+  "Parkway"
+],
 
-  OgdenEastRidge: [
-    "Evergreen Park",
-    "Farr’s Fort",
-    "Foothill Trails",
-    "Liberty Cottages",
-    "Mill creek",
-    "Paradise Acres",
-    "Rolling Hills",
-    "Shoreline Ridge"
-  ],
+OgdenEastRidge: [
+  "Evergreen Park",
+  "Farr’s Fort",
+  "Foothill Trails",
+  "Liberty Cottages",
+  "Mill creek",
+  "Paradise Acres",
+  "Rolling Hills",
+  "Shoreline Ridge"
+],
 
-  OgdenMoundFort: [
-    "Adobe mill",
-    "Heritage Park",
-    "Meadowbrook",
-    "Mill Creek",
-    "Ogden river",
-    "Pioneer"
-  ],
+OgdenMoundFort: [
+  "Adobe mill",
+  "Heritage Park",
+  "Meadowbrook",
+  "Mill Creek",
+  "Ogden river",
+  "Pioneer"
+],
 
-  OgdenUtahMountLewis: ["1st", "2nd", "3rd", "4th", "5th", "6th", "9th"],
+OgdenUtahMountLewis: ["1st", "2nd", "3rd", "4th", "5th", "6th", "9th"],
 
-  OgdenUtahWeberNorth: [
-    "Warren",
-    "West Warren",
-    "West Weber 1st",
-    "West Weber 2nd",
-    "West Weber 3rd",
-    "Wilson 1st",
-    "Wilson 6th",
-    "Wilson 7th"
-  ],
+OgdenUtahWeberNorth: [
+  "Warren",
+  "West Warren",
+  "West Weber 1st",
+  "West Weber 2nd",
+  "West Weber 3rd",
+  "Wilson 1st",
+  "Wilson 6th",
+  "Wilson 7th"
+],
 
-  OgdenWest: [
-    "Kanesville",
-    "Taylor 1st",
-    "Taylor 2nd",
-    "Taylor 3rd",
-    "Taylor 4th",
-    "Taylor 5th",
-    "Taylor 6th"
-  ],
+OgdenWest: [
+  "Kanesville",
+  "Taylor 1st",
+  "Taylor 2nd",
+  "Taylor 3rd",
+  "Taylor 4th",
+  "Taylor 5th",
+  "Taylor 6th"
+],
 
-  PerryUtah: [
-    "10th",
-    "1st",
-    "2nd",
-    "4th",
-    "5th",
-    "6th",
-    "7th",
-    "8th",
-    "9th",
-    "Box Elder YSA 1st"
-  ],
+PerryUtah: [
+  "1st",
+  "2nd",
+  "4th",
+  "5th",
+  "6th",
+  "7th",
+  "8th",
+  "9th",
+  "10th",
+  "Box Elder YSA 1st"
+],
 
-  PlainCity: [
-    "1st",
-    "3rd",
-    "4th",
-    "5th",
-    "6th",
-    "9th",
-    "Meadows",
-    "Riverside"
-  ],
+PlainCity: [
+  "1st",
+  "3rd",
+  "4th",
+  "5th",
+  "6th",
+  "9th",
+  "Meadows",
+  "Riverside"
+],
 
-  PleasantView: [
-    "Pleasant View 11th",
-    "Pleasant View 12th",
-    "Pleasant View 14th",
-    "Pleasant View 18th",
-    "Pleasant View 1st",
-    "Pleasant View 3rd",
-    "Pleasant View 4th",
-    "Pleasant View 6th"
-  ],
+PleasantView: [
+  "Pleasant View 1st",
+  "Pleasant View 3rd",
+  "Pleasant View 4th",
+  "Pleasant View 6th",
+  "Pleasant View 11th",
+  "Pleasant View 12th",
+  "Pleasant View 14th",
+  "Pleasant View 18th"
+],
 
-  PleasantViewOrchardSprings: [
-    "13th",
-    "15th",
-    "16th",
-    "17th",
-    "5th",
-    "7th",
-    "Misty Meadows"
-  ],
+PleasantViewOrchardSprings: [
+  "5th",
+  "7th",
+  "13th",
+  "15th",
+  "16th",
+  "17th",
+  "Misty Meadows"
+],
 
-  PleasantViewSouth: [
-    "Harrisville 4th",
-    "Harrisville 5th",
-    "Hidden Meadows",
-    "Pleasant View 10th",
-    "Pleasant View 2nd",
-    "Pleasant View 8th",
-    "Pleasant View 9th"
-  ],
+PleasantViewSouth: [
+  "Harrisville 4th",
+  "Harrisville 5th",
+  "Hidden Meadows",
+  "Pleasant View 2nd",
+  "Pleasant View 8th",
+  "Pleasant View 9th",
+  "Pleasant View 10th"
+],
 
-  WestHaven: [
-    "Country Meadows",
-    "Olive Bluff",
-    "Rosewood",
-    "Salt Point",
-    "Stone Creek",
-    "West Haven",
-    "White Rail"
-  ],
+WestHaven: [
+  "Country Meadows",
+  "Olive Bluff",
+  "Rosewood",
+  "Salt Point",
+  "Stone Creek",
+  "West Haven",
+  "White Rail"
+],
 
-  WestHavenNorth: [
-    "Riverbend",
-    "Wilson 2nd",
-    "Wilson 3rd",
-    "Wilson 4th",
-    "Wilson 5th"
-  ],
+WestHavenNorth: [
+  "Riverbend",
+  "Wilson 2nd",
+  "Wilson 3rd",
+  "Wilson 4th",
+  "Wilson 5th"
+],
 
-  Willard: [
-    "Hargis Hill",
-    "Maguire Canyon",
-    "Perry 3rd",
-    "Three Mile Creek",
-    "Willard 1st",
-    "Willard 2nd",
-    "Willard 3rd",
-    "Willard 4th",
-    "Willard 5th",
-    "Willard 6th"
-  ]
+Willard: [
+  "Hargis Hill",
+  "Maguire Canyon",
+  "Perry 3rd",
+  "Three Mile Creek",
+  "Willard 1st",
+  "Willard 2nd",
+  "Willard 3rd",
+  "Willard 4th",
+  "Willard 5th",
+  "Willard 6th"
+]
 
 };
   // Alias so the rest of the code works (it expects stakeWards)
