@@ -18,8 +18,6 @@
     th { background:#f3f4f6; font-size:12px; text-align:left; position: sticky; top: 0; }
     .rownum { width:48px; text-align:center; color:#6b7280; background:#E5E3DC; }
 
-    
-
     .tableWrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
     td.details { min-width:520px; }
     .detailsGrid { display:grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap:8px; }
@@ -27,13 +25,14 @@
     .miniLabel input, .miniLabel select { font-size:14px; color:#111827; }
 
     .optcell { text-align:center; }
-    .optcell input[type="checkbox"] { width:18px; height:18px; }
+    .optcell input[type="checkbox"] { width:auto; transform: scale(1.1); }
 
     @media (max-width: 900px) {
       td.details { min-width:320px; }
       .detailsGrid { grid-template-columns: 1fr; }
     }
-input, select {
+
+    input, select {
       width:100%;
       padding:8px;
       border:1px solid #d1d5db;
@@ -51,7 +50,6 @@ input, select {
     .ok { color:#065f46; }
     .err { color:#991b1b; }
 
-    /* Decoy fields: off-screen but present */
     .decoy {
       position: absolute;
       left: -9999px;
@@ -61,18 +59,47 @@ input, select {
       opacity: 0;
       pointer-events: none;
     }
-  
-    .optcell { text-align:center; }
-    .optcell input[type="checkbox"] { width:auto; transform: scale(1.1); }
 
-  
-    .topSelectors { margin: 0 0 14px 0; padding: 12px; border:1px solid #e5e7eb; border-radius:12px; background:#fbfbfc; }
-    .topGrid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-    .topSelectors label { display:block; font-size:14px; color:#111827; }
-    .topSelectors select { width:100%; margin-top:6px; padding:10px 10px; border:1px solid #d1d5db; border-radius:10px; background:#fff; font-size:14px; }
+    .topSelectors {
+      margin: 0 0 14px 0;
+      padding: 12px;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      background:#fbfbfc;
+    }
+
+    .topGrid {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+
+    .topSelectors label {
+      display:block;
+      font-size:14px;
+      color:#111827;
+    }
+
+    .topSelectors select,
+    .topSelectors input {
+      width:100%;
+      margin-top:6px;
+      padding:10px 10px;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      background:#fff;
+      font-size:14px;
+    }
+
     .hint { margin-top:8px; font-size:12px; color:#6b7280; }
-    @media (max-width: 760px) { .topGrid { grid-template-columns: 1fr; } }
 
+    @media (max-width: 1000px) {
+      .topGrid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .topGrid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
@@ -86,15 +113,21 @@ input, select {
 
     <form id="volForm" autocomplete="off" style="padding:16px; position:relative;">
 
-      <!-- Autofill decoys (most browsers/password managers will fill THESE instead of your grid) -->
       <input class="decoy" type="text"  name="contact_name"  autocomplete="name">
       <input class="decoy" type="email" name="contact_email" autocomplete="email">
       <input class="decoy" type="tel"   name="contact_phone" autocomplete="tel">
       <input class="decoy" type="password" name="password" autocomplete="current-password">
 
-      
       <div class="topSelectors">
         <div class="topGrid">
+          <label>Submitter Name
+            <input id="submitterName" name="submitterName" type="text" required />
+          </label>
+
+          <label>Submitter Phone
+            <input id="submitterPhone" name="submitterPhone" type="tel" required inputmode="tel" placeholder="8015551234" />
+          </label>
+
           <label>Stake
             <select id="stakeTop" name="stakeTop" required>
               <option value="">Select stake</option>
@@ -110,21 +143,20 @@ input, select {
         <div class="hint">Select the Stake and Ward once. All rows submitted below will use the same Stake and Ward.</div>
       </div>
 
-
       <div class="tableWrap">
-      <table>
-        <thead>
-          <tr>
-            <th class="rownum">#</th>
-            <th>Full Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>SMS Opt-In</th>
-            <th>Details</th>
-          </tr>
-        </thead>
-        <tbody id="grid"></tbody>
-      </table>
+        <table>
+          <thead>
+            <tr>
+              <th class="rownum">#</th>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>SMS Opt-In</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="grid"></tbody>
+        </table>
       </div>
 
       <div class="actions">
@@ -132,7 +164,6 @@ input, select {
         <button class="secondary" type="button" id="clearBtn">Clear</button>
         <span id="status" class="status"></span>
       </div>
-
 
       <div style="margin-top:16px; padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#fafafa;">
         <div style="font-weight:700; margin-bottom:6px;">SMS Opt-In Consent</div>
@@ -151,287 +182,283 @@ input, select {
 
 <script>
 function initVolunteerGrid() {
-
   const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/96f6sv5el9g4r6q12gar1ft84l5e5ylq";
 
-const STAKE_WARDS = {
+  const STAKE_WARDS = {
+    BenLomond: ["1st", "4th", "5th", "8th", "9th", "10th", "11th", "12th"],
 
-BenLomond: ["1st", "4th", "5th", "8th", "9th", "10th", "11th", "12th"],
+    BrighamCitySouth: [
+      "Brigham City 6th",
+      "Brigham City 10th",
+      "Brigham City 16th",
+      "Brigham City 19th",
+      "Brigham City 21st",
+      "Brigham City 25th",
+      "Lakeview",
+      "Maple Springs branches",
+      "Mountain View"
+    ],
 
-BrighamCitySouth: [
-  "Brigham City 6th",
-  "Brigham City 10th",
-  "Brigham City 16th",
-  "Brigham City 19th",
-  "Brigham City 21st",
-  "Brigham City 25th",
-  "Lakeview",
-  "Maple Springs branches",
-  "Mountain View"
-],
+    FarrWest: [
+      "Farr West 4th",
+      "Farr West 5th",
+      "Farr West 6th",
+      "Farr West 9th",
+      "Farr West 11th",
+      "Plain City 2nd",
+      "Plain City 7th",
+      "Plain City 8th",
+      "Plain City 10th"
+    ],
 
-FarrWest: [
-  "Farr West 4th",
-  "Farr West 5th",
-  "Farr West 6th",
-  "Farr West 9th",
-  "Farr West 11th",
-  "Plain City 2nd",
-  "Plain City 7th",
-  "Plain City 8th",
-  "Plain City 10th"
-],
+    FarrWestPoplar: [
+      "Cottonwood Creek",
+      "Farr West 1st",
+      "Farr West 2nd",
+      "Farr West 3rd",
+      "Farr West 7th",
+      "Farr West 8th",
+      "Poplar 1st",
+      "Poplar 2nd",
+      "Poplar 3rd",
+      "Poplar 4th"
+    ],
 
-FarrWestPoplar: [
-  "Cottonwood Creek",
-  "Farr West 1st",
-  "Farr West 2nd",
-  "Farr West 3rd",
-  "Farr West 7th",
-  "Farr West 8th",
-  "Poplar 1st",
-  "Poplar 2nd",
-  "Poplar 3rd",
-  "Poplar 4th"
-],
+    Harrisville: [
+      "Harrisville 1st",
+      "Harrisville 2nd",
+      "Harrisville 3rd",
+      "Harrisville 6th",
+      "Harrisville 7th",
+      "Harrisville 8th",
+      "Harrisville 9th",
+      "Harrisville 10th"
+    ],
 
-Harrisville: [
-  "Harrisville 1st",
-  "Harrisville 2nd",
-  "Harrisville 3rd",
-  "Harrisville 6th",
-  "Harrisville 7th",
-  "Harrisville 8th",
-  "Harrisville 9th",
-  "Harrisville 10th"
-],
+    Hooper: [
+      "Homestead",
+      "Hooper 1st",
+      "Hooper 2nd",
+      "Hooper 3rd",
+      "Hooper 4th",
+      "Lakeview",
+      "Park",
+      "Quail Meadows",
+      "Shannondoah"
+    ],
 
-Hooper: [
-  "Homestead",
-  "Hooper 1st",
-  "Hooper 2nd",
-  "Hooper 3rd",
-  "Hooper 4th",
-  "Lakeview",
-  "Park",
-  "Quail Meadows",
-  "Shannondoah"
-],
+    HooperUtahPioneerTrail: [
+      "Eastgate",
+      "Freedom",
+      "Fremont",
+      "Hooper Landings",
+      "Muskrat Springs",
+      "Pioneer Trail",
+      "Wildwood"
+    ],
 
-HooperUtahPioneerTrail: [
-  "Eastgate",
-  "Freedom",
-  "Fremont",
-  "Hooper Landings",
-  "Muskrat Springs",
-  "Pioneer Trail",
-  "Wildwood"
-],
+    HuntsvilleUtah: [
+      "Eden 1st",
+      "Eden 2nd",
+      "Huntsville 1st",
+      "Huntsville 2nd",
+      "Liberty 1st",
+      "Liberty 2nd",
+      "Middle Fork",
+      "Nordic Valley",
+      "North Fork",
+      "South Fork",
+      "Wolf Creek"
+    ],
 
-HuntsvilleUtah: [
-  "Eden 1st",
-  "Eden 2nd",
-  "Huntsville 1st",
-  "Huntsville 2nd",
-  "Liberty 1st",
-  "Liberty 2nd",
-  "Middle Fork",
-  "Nordic Valley",
-  "North Fork",
-  "South Fork",
-  "Wolf Creek"
-],
+    Kanesville: [
+      "Country View",
+      "Fair Grove",
+      "Foxglen Park",
+      "Pheasant Meadow",
+      "Prairie Crossing",
+      "Regal Country",
+      "Rocky Mountain"
+    ],
 
-Kanesville: [
-  "Country View",
-  "Fair Grove",
-  "Foxglen Park",
-  "Pheasant Meadow",
-  "Prairie Crossing",
-  "Regal Country",
-  "Rocky Mountain"
-],
+    NorthOgden: [
+      "North Ogden 1st",
+      "North Ogden 3rd",
+      "North Ogden 5th",
+      "North Ogden 7th",
+      "North Ogden 9th",
+      "North Ogden 16th",
+      "North Ogden 17th",
+      "North Ogden 21st"
+    ],
 
-NorthOgden: [
-  "North Ogden 1st",
-  "North Ogden 3rd",
-  "North Ogden 5th",
-  "North Ogden 7th",
-  "North Ogden 9th",
-  "North Ogden 16th",
-  "North Ogden 17th",
-  "North Ogden 21st"
-],
+    NorthOgdenColdwater: [
+      "2nd",
+      "4th",
+      "6th",
+      "10th",
+      "12th",
+      "15th",
+      "19th",
+      "23rd",
+      "Mountain"
+    ],
 
-NorthOgdenColdwater: [
-  "2nd",
-  "4th",
-  "6th",
-  "10th",
-  "12th",
-  "15th",
-  "19th",
-  "23rd",
-  "Mountain"
-],
+    NorthOgdenEast: [
+      "North Ogden 8th",
+      "North Ogden 11th",
+      "North Ogden 13th",
+      "North Ogden 14th",
+      "North Ogden 20th",
+      "North Ogden 22nd",
+      "North Ogden 24th"
+    ],
 
-NorthOgdenEast: [
-  "North Ogden 8th",
-  "North Ogden 11th",
-  "North Ogden 13th",
-  "North Ogden 14th",
-  "North Ogden 20th",
-  "North Ogden 22nd",
-  "North Ogden 24th"
-],
+    Ogden: [
+      "Bonneville Shoreline",
+      "Hidden Valley",
+      "Jefferson 2nd (Spanish)",
+      "Malan's Peak",
+      "Monroe Branch (retirement)",
+      "Ogden 4th",
+      "Parkway"
+    ],
 
-Ogden: [
-  "Bonneville Shoreline",
-  "Hidden Valley",
-  "Jefferson 2nd (Spanish)",
-  "Malan's Peak",
-  "Monroe Branch (retirement)",
-  "Ogden 4th",
-  "Parkway"
-],
+    OgdenEastRidge: [
+      "Evergreen Park",
+      "Farr’s Fort",
+      "Foothill Trails",
+      "Liberty Cottages",
+      "Mill creek",
+      "Paradise Acres",
+      "Rolling Hills",
+      "Shoreline Ridge"
+    ],
 
-OgdenEastRidge: [
-  "Evergreen Park",
-  "Farr’s Fort",
-  "Foothill Trails",
-  "Liberty Cottages",
-  "Mill creek",
-  "Paradise Acres",
-  "Rolling Hills",
-  "Shoreline Ridge"
-],
+    OgdenMoundFort: [
+      "Adobe mill",
+      "Heritage Park",
+      "Meadowbrook",
+      "Mill Creek",
+      "Ogden river",
+      "Pioneer"
+    ],
 
-OgdenMoundFort: [
-  "Adobe mill",
-  "Heritage Park",
-  "Meadowbrook",
-  "Mill Creek",
-  "Ogden river",
-  "Pioneer"
-],
+    OgdenUtahMountLewis: ["1st", "2nd", "3rd", "4th", "5th", "6th", "9th"],
 
-OgdenUtahMountLewis: ["1st", "2nd", "3rd", "4th", "5th", "6th", "9th"],
+    OgdenUtahWeberNorth: [
+      "Warren",
+      "West Warren",
+      "West Weber 1st",
+      "West Weber 2nd",
+      "West Weber 3rd",
+      "Wilson 1st",
+      "Wilson 6th",
+      "Wilson 7th"
+    ],
 
-OgdenUtahWeberNorth: [
-  "Warren",
-  "West Warren",
-  "West Weber 1st",
-  "West Weber 2nd",
-  "West Weber 3rd",
-  "Wilson 1st",
-  "Wilson 6th",
-  "Wilson 7th"
-],
+    OgdenWest: [
+      "Kanesville",
+      "Taylor 1st",
+      "Taylor 2nd",
+      "Taylor 3rd",
+      "Taylor 4th",
+      "Taylor 5th",
+      "Taylor 6th"
+    ],
 
-OgdenWest: [
-  "Kanesville",
-  "Taylor 1st",
-  "Taylor 2nd",
-  "Taylor 3rd",
-  "Taylor 4th",
-  "Taylor 5th",
-  "Taylor 6th"
-],
+    PerryUtah: [
+      "1st",
+      "2nd",
+      "4th",
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "9th",
+      "10th",
+      "Box Elder YSA 1st"
+    ],
 
-PerryUtah: [
-  "1st",
-  "2nd",
-  "4th",
-  "5th",
-  "6th",
-  "7th",
-  "8th",
-  "9th",
-  "10th",
-  "Box Elder YSA 1st"
-],
+    PlainCity: [
+      "1st",
+      "3rd",
+      "4th",
+      "5th",
+      "6th",
+      "9th",
+      "Meadows",
+      "Riverside"
+    ],
 
-PlainCity: [
-  "1st",
-  "3rd",
-  "4th",
-  "5th",
-  "6th",
-  "9th",
-  "Meadows",
-  "Riverside"
-],
+    PleasantView: [
+      "Pleasant View 1st",
+      "Pleasant View 3rd",
+      "Pleasant View 4th",
+      "Pleasant View 6th",
+      "Pleasant View 11th",
+      "Pleasant View 12th",
+      "Pleasant View 14th",
+      "Pleasant View 18th"
+    ],
 
-PleasantView: [
-  "Pleasant View 1st",
-  "Pleasant View 3rd",
-  "Pleasant View 4th",
-  "Pleasant View 6th",
-  "Pleasant View 11th",
-  "Pleasant View 12th",
-  "Pleasant View 14th",
-  "Pleasant View 18th"
-],
+    PleasantViewOrchardSprings: [
+      "5th",
+      "7th",
+      "13th",
+      "15th",
+      "16th",
+      "17th",
+      "Misty Meadows"
+    ],
 
-PleasantViewOrchardSprings: [
-  "5th",
-  "7th",
-  "13th",
-  "15th",
-  "16th",
-  "17th",
-  "Misty Meadows"
-],
+    PleasantViewSouth: [
+      "Harrisville 4th",
+      "Harrisville 5th",
+      "Hidden Meadows",
+      "Pleasant View 2nd",
+      "Pleasant View 8th",
+      "Pleasant View 9th",
+      "Pleasant View 10th"
+    ],
 
-PleasantViewSouth: [
-  "Harrisville 4th",
-  "Harrisville 5th",
-  "Hidden Meadows",
-  "Pleasant View 2nd",
-  "Pleasant View 8th",
-  "Pleasant View 9th",
-  "Pleasant View 10th"
-],
+    WestHaven: [
+      "Country Meadows",
+      "Olive Bluff",
+      "Rosewood",
+      "Salt Point",
+      "Stone Creek",
+      "West Haven",
+      "White Rail"
+    ],
 
-WestHaven: [
-  "Country Meadows",
-  "Olive Bluff",
-  "Rosewood",
-  "Salt Point",
-  "Stone Creek",
-  "West Haven",
-  "White Rail"
-],
+    WestHavenNorth: [
+      "Riverbend",
+      "Wilson 2nd",
+      "Wilson 3rd",
+      "Wilson 4th",
+      "Wilson 5th"
+    ],
 
-WestHavenNorth: [
-  "Riverbend",
-  "Wilson 2nd",
-  "Wilson 3rd",
-  "Wilson 4th",
-  "Wilson 5th"
-],
+    Willard: [
+      "Hargis Hill",
+      "Maguire Canyon",
+      "Perry 3rd",
+      "Three Mile Creek",
+      "Willard 1st",
+      "Willard 2nd",
+      "Willard 3rd",
+      "Willard 4th",
+      "Willard 5th",
+      "Willard 6th"
+    ]
+  };
 
-Willard: [
-  "Hargis Hill",
-  "Maguire Canyon",
-  "Perry 3rd",
-  "Three Mile Creek",
-  "Willard 1st",
-  "Willard 2nd",
-  "Willard 3rd",
-  "Willard 4th",
-  "Willard 5th",
-  "Willard 6th"
-]
-
-};
-  // Alias so the rest of the code works (it expects stakeWards)
   const stakeWards = STAKE_WARDS;
-
 
   const timeMap = {
     "AM Volunteer": "8:30-10:30 AM",
-    "PM Volunteer": "5:00-7:00 PM"
+    "PM Volunteer": "5:30-7:30 PM"
   };
 
   const grid = document.getElementById("grid");
@@ -439,7 +466,6 @@ Willard: [
   const wardTop  = document.getElementById("wardTop");
   const form     = document.getElementById("volForm");
 
-  // If any are missing, stop with a helpful error
   if (!grid || !stakeTop || !wardTop || !form) {
     console.error("Missing required element(s):", { grid, stakeTop, wardTop, form });
     return;
@@ -462,11 +488,12 @@ Willard: [
   }
 
   stakeTop.addEventListener("change", () => {
-  updateWardsTop();
-  wardTop.value = "";
+    updateWardsTop();
+    wardTop.value = "";
   });
+
   populateStakeTop();
-  updateWardsTop(); // initialize ward list to match current stake (blank)
+  updateWardsTop();
 
   const IGNORE_ATTRS = `
     autocomplete="new-password"
@@ -480,10 +507,9 @@ Willard: [
     tr.innerHTML = `
       <td class="rownum">${i+1}</td>
       <td><input id="fn_${i}" name="fn_${i}" type="text" ${IGNORE_ATTRS} autocapitalize="words" spellcheck="false" /></td>
-      <td><input id="ph_${i}" name="ph_${i}" type="tel"  ${IGNORE_ATTRS} inputmode="tel" /></td>
+      <td><input id="ph_${i}" name="ph_${i}" type="tel" ${IGNORE_ATTRS} inputmode="tel" placeholder="8015551234" /></td>
       <td><input id="em_${i}" name="em_${i}" type="email" ${IGNORE_ATTRS} autocapitalize="none" spellcheck="false" inputmode="email" /></td>
       <td class="optcell"><input id="oi_${i}" name="oi_${i}" type="checkbox" aria-label="SMS Opt-In" /></td>
-
       <td class="details">
         <div class="detailsGrid">
           <label class="miniLabel">Date
@@ -502,28 +528,54 @@ Willard: [
             <select id="tr_${i}" name="tr_${i}">
               <option value="">Select</option>
               <option value="8:30-10:30 AM">8:30-10:30 AM</option>
-              <option value="5:00-7:00 PM">5:30-7:30 PM</option>
+              <option value="5:30-7:30 PM">5:30-7:30 PM</option>
             </select>
           </label>
         </div>
       </td>
     `;
+
     tr.querySelector(`#ts_${i}`).addEventListener("change", () => {
       const ts = document.getElementById(`ts_${i}`).value;
       document.getElementById(`tr_${i}`).value = timeMap[ts] || "";
     });
+
+    const nameInput = tr.querySelector(`#fn_${i}`);
+    const phoneInput = tr.querySelector(`#ph_${i}`);
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        phoneInput.focus();
+      }
+    });
+
     return tr;
   }
 
-  // Render 8 rows
   grid.innerHTML = "";
-  for (let i=0; i<8; i++) grid.appendChild(createRow(i));
+  for (let i = 0; i < 8; i++) grid.appendChild(createRow(i));
 
   const v = (id) => (document.getElementById(id).value || "").trim();
   const c = (id) => !!document.getElementById(id).checked;
 
   const digitsOnly = (s) => (s || "").replace(/\D/g, "");
   const norm = (s) => (s || "").toLowerCase().trim().replace(/\s+/g, " ");
+
+  function isValidPhone(phone) {
+    return digitsOnly(phone).length === 10;
+  }
+
+  function rowHasAnyData(i) {
+    return [
+      v(`fn_${i}`),
+      v(`ph_${i}`),
+      v(`em_${i}`),
+      v(`dt_${i}`),
+      v(`ts_${i}`),
+      v(`tr_${i}`)
+    ].some(Boolean);
+  }
 
   function buildDedupeKey({ stake, ward, fullName, phone, date, timeslot }) {
     return [
@@ -538,14 +590,14 @@ Willard: [
 
   function collectRows() {
     const rows = [];
-    for (let i=0; i<8; i++) {
+    for (let i = 0; i < 8; i++) {
       const stake = v("stakeTop");
       const ward  = v("wardTop");
 
       const rBase = {
-        row: i+1,
+        row: i + 1,
         fullName: v(`fn_${i}`),
-        phone: v(`ph_${i}`),
+        phone: digitsOnly(v(`ph_${i}`)),
         email: v(`em_${i}`),
         stake,
         ward,
@@ -557,18 +609,19 @@ Willard: [
       const r = {
         ...rBase,
         dedupeKey: buildDedupeKey(rBase),
-        optIn: c(`oi_${i}`) // keep last
+        optIn: c(`oi_${i}`)
       };
 
-      const hasAny = Object.entries(r).some(([k,val]) =>
-        !["row","optIn","stake","ward","dedupeKey"].includes(k) && val
+      const hasAny = Object.entries(r).some(([k, val]) =>
+        !["row", "optIn", "stake", "ward", "dedupeKey"].includes(k) && val
       );
+
       if (hasAny) rows.push(r);
     }
     return rows;
   }
 
-  function setStatus(msg, cls="") {
+  function setStatus(msg, cls = "") {
     const s = document.getElementById("status");
     s.textContent = msg;
     s.className = `status ${cls}`;
@@ -577,24 +630,91 @@ Willard: [
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    if (!v("stakeTop")) { setStatus("Select a Stake at the top of the form.", "err"); return; }
-    if (!v("wardTop"))  { setStatus("Select a Ward at the top of the form.", "err"); return; }
+    if (!v("submitterName")) {
+      setStatus("Enter the submitter name.", "err");
+      document.getElementById("submitterName").focus();
+      return;
+    }
+
+    if (!isValidPhone(v("submitterPhone"))) {
+      setStatus("Enter a valid 10-digit submitter phone number.", "err");
+      document.getElementById("submitterPhone").focus();
+      return;
+    }
+
+    if (!v("stakeTop")) {
+      setStatus("Select a Stake at the top of the form.", "err");
+      stakeTop.focus();
+      return;
+    }
+
+    if (!v("wardTop")) {
+      setStatus("Select a Ward at the top of the form.", "err");
+      wardTop.focus();
+      return;
+    }
+
+    let usedRowCount = 0;
+
+    for (let i = 0; i < 8; i++) {
+      if (!rowHasAnyData(i)) continue;
+
+      usedRowCount++;
+
+      const name = v(`fn_${i}`);
+      const phone = v(`ph_${i}`);
+      const date = v(`dt_${i}`);
+      const timeslot = v(`ts_${i}`);
+
+      if (!name) {
+        setStatus(`Row ${i + 1}: Enter the volunteer's full name.`, "err");
+        document.getElementById(`fn_${i}`).focus();
+        return;
+      }
+
+      if (!isValidPhone(phone)) {
+        setStatus(`Row ${i + 1}: Enter a valid 10-digit phone number.`, "err");
+        document.getElementById(`ph_${i}`).focus();
+        return;
+      }
+
+      if (!date) {
+        setStatus(`Row ${i + 1}: Select a date.`, "err");
+        document.getElementById(`dt_${i}`).focus();
+        return;
+      }
+
+      if (!timeslot) {
+        setStatus(`Row ${i + 1}: Select a time slot.`, "err");
+        document.getElementById(`ts_${i}`).focus();
+        return;
+      }
+    }
+
+    if (!usedRowCount) {
+      setStatus("No data to submit.", "err");
+      return;
+    }
 
     const rows = collectRows();
-    if (!rows.length) { setStatus("No data to submit.", "err"); return; }
 
     setStatus("Submitting…");
     try {
       const res = await fetch(MAKE_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ submittedAt: new Date().toISOString(), rows })
+        body: JSON.stringify({
+          submittedAt: new Date().toISOString(),
+          submitterName: v("submitterName"),
+          submitterPhone: digitsOnly(v("submitterPhone")),
+          rows
+        })
       });
 
       const text = await res.text();
       if (res.ok) {
         setStatus(`Submitted ${rows.length} row(s).`, "ok");
-        document.getElementById("clearBtn").click(); // auto-clear after success
+        document.getElementById("clearBtn").click();
       } else {
         setStatus(`Submit failed (${res.status}): ${text}`, "err");
       }
@@ -604,17 +724,22 @@ Willard: [
   });
 
   document.getElementById("clearBtn").addEventListener("click", () => {
-    for (let i=0; i<8; i++) {
-      ["fn","ph","em","dt"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
+    document.getElementById("submitterName").value = "";
+    document.getElementById("submitterPhone").value = "";
+    stakeTop.value = "";
+    updateWardsTop();
+    wardTop.value = "";
+
+    for (let i = 0; i < 8; i++) {
+      ["fn", "ph", "em", "dt"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
       document.getElementById(`oi_${i}`).checked = false;
-      ["ts","tr"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
+      ["ts", "tr"].forEach(p => document.getElementById(`${p}_${i}`).value = "");
     }
+
     setStatus("");
   });
-
 }
 
-// Run init reliably, even if DOMContentLoaded already fired
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initVolunteerGrid);
 } else {
